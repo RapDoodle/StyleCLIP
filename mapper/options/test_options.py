@@ -1,4 +1,7 @@
+import torch
 from argparse import ArgumentParser
+
+from utils import handle_default_device
 
 
 class TestOptions:
@@ -27,6 +30,9 @@ class TestOptions:
 
 		self.parser.add_argument('--n_images', type=int, default=None, help='Number of images to output. If None, run on all data')
 
+		self.parser.add_argument('--device', type=str, default=None, required=False)
+
 	def parse(self):
 		opts = self.parser.parse_args()
+		handle_default_device(opts)
 		return opts

@@ -175,23 +175,23 @@ imagenet_templates = [
 ]
 
 
-def zeroshot_classifier(classnames, templates,model):
+def zeroshot_classifier(classnames, templates,model,device):
     with torch.no_grad():
         zeroshot_weights = []
         for classname in classnames:
             texts = [template.format(classname) for template in templates] #format with class
-            texts = clip.tokenize(texts).cuda() #tokenize
+            texts = clip.tokenize(texts).to(device) #tokenize
             class_embeddings = model.encode_text(texts) #embed with text encoder
             class_embeddings /= class_embeddings.norm(dim=-1, keepdim=True)
             class_embedding = class_embeddings.mean(dim=0)
             class_embedding /= class_embedding.norm()
             zeroshot_weights.append(class_embedding)
-        zeroshot_weights = torch.stack(zeroshot_weights, dim=1).cuda()
+        zeroshot_weights = torch.stack(zeroshot_weights, dim=1).to(device)
     return zeroshot_weights
 
 
-def GetDt(classnames,model):
-    text_features=zeroshot_classifier(classnames, imagenet_templates,model).t()
+def GetDt(classnames,model,device):
+    text_features=zeroshot_classifier(classnames, imagenet_templates,model,device).t()
     
     dt=text_features[0]-text_features[1]
     dt=dt.cpu().numpy()

@@ -33,7 +33,7 @@ def run(test_opts):
 
 	net = StyleCLIPMapper(opts)
 	net.eval()
-	net.cuda()
+	net.to(test_opts.device)
 
 	test_latents = torch.load(opts.latents_test_path)
 	if opts.work_in_stylespace:
@@ -57,10 +57,10 @@ def run(test_opts):
 		with torch.no_grad():
 			if opts.work_in_stylespace:
 				input_cuda = convert_s_tensor_to_list(input_batch)
-				input_cuda = [c.cuda() for c in input_cuda]
+				input_cuda = [c.to(opts.device) for c in input_cuda]
 			else:
 				input_cuda = input_batch
-				input_cuda = input_cuda.cuda()
+				input_cuda = input_cuda.to(opts.device)
 
 			tic = time.time()
 			result_batch = run_on_batch(input_cuda, net, opts.couple_outputs, opts.work_in_stylespace)

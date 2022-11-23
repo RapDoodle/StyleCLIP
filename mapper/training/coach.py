@@ -22,8 +22,7 @@ class Coach:
 
 		self.global_step = 0
 
-		self.device = 'cuda:0'
-		self.opts.device = self.device
+		self.device = opts.device
 
 		# Initialize network
 		self.net = StyleCLIPMapper(self.opts).to(self.device)
@@ -52,7 +51,7 @@ class Coach:
 										  num_workers=int(self.opts.test_workers),
 										  drop_last=True)
 
-		self.text_inputs = torch.cat([clip.tokenize(self.opts.description)]).cuda()
+		self.text_inputs = torch.cat([clip.tokenize(self.opts.description)]).to(opts.device)
 
 		# Initialize logger
 		log_dir = os.path.join(opts.exp_dir, 'logs')
@@ -183,7 +182,7 @@ class Coach:
 		if self.opts.latents_train_path:
 			train_latents = torch.load(self.opts.latents_train_path)
 		else:
-			train_latents_z = torch.randn(self.opts.train_dataset_size, 512).cuda()
+			train_latents_z = torch.randn(self.opts.train_dataset_size, 512).to(self.device)
 			train_latents = []
 			for b in range(self.opts.train_dataset_size // self.opts.batch_size):
 				with torch.no_grad():
@@ -195,7 +194,7 @@ class Coach:
 		if self.opts.latents_test_path:
 			test_latents = torch.load(self.opts.latents_test_path)
 		else:
-			test_latents_z = torch.randn(self.opts.train_dataset_size, 512).cuda()
+			test_latents_z = torch.randn(self.opts.train_dataset_size, 512).to(self.device)
 			test_latents = []
 			for b in range(self.opts.test_dataset_size // self.opts.test_batch_size):
 				with torch.no_grad():
